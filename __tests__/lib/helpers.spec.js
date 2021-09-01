@@ -515,6 +515,79 @@ describe('helpers', () => {
       helpers.genResponse(dst, response);
       expect(dst).toEqual(expected);
     });
+
+    test('generates valid response with examples', () => {
+      const dst = {};
+      const response = {
+        200: {
+          type: 'object',
+          headers: {
+            'X-Powered-By': {
+              description: 'header',
+              schema: {
+                type: 'string',
+              },
+            },
+          },
+          properties: {
+            hello: { type: 'string' },
+          },
+          examples: [
+            {
+              name: 'Capital Letters',
+              summary: 'All string values are capitals',
+              value: { hello: 'world 1' },
+            },
+            {
+              name: 'Default values',
+              summary: 'Using enum defaults',
+              value: { hello: 'world 2' },
+            },
+          ],
+        },
+        500: {
+          links: ['https://example.com'],
+          description: 'Some error',
+        },
+      };
+
+      const expected = {
+        200: {
+          headers: {
+            'X-Powered-By': {
+              description: 'header',
+              schema: {
+                type: 'string',
+              },
+            },
+          },
+          content: {
+            '*/*': {
+              examples: {
+                'Capital Letters': {
+                  summary: 'All string values are capitals',
+                  value: { hello: 'world 1' },
+                },
+                'Default values': {
+                  summary: 'Using enum defaults',
+                  value: { hello: 'world 2' },
+                },
+              },
+              schema: {
+                properties: { hello: { type: 'string' } },
+                type: 'object',
+              },
+            },
+          },
+        },
+        500: {
+          links: ['https://example.com'],
+          description: 'Some error',
+        },
+      };
+      helpers.genResponse(dst, response);
+      expect(dst).toEqual(expected);
+    });
   });
 
   describe('formatParamUrl', () => {
