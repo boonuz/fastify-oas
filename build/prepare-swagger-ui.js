@@ -1,5 +1,5 @@
 const fs = require('fs');
-const {promisify} = require('util');
+const { promisify } = require('util');
 const path = require('path');
 const swaggerUiAssetPath = require('swagger-ui-dist').getAbsoluteFSPath();
 
@@ -29,24 +29,24 @@ const STATIC_DIR = './static';
   } catch (ex) {
     // do nothing, directory not exists
   }
-  [
-    'favicon-16x16.png',
-    'favicon-32x32.png',
-    'index.html',
-    'oauth2-redirect.html',
-    'swagger-ui-bundle.js',
-    'swagger-ui-bundle.js.map',
-    'swagger-ui-standalone-preset.js',
-    'swagger-ui-standalone-preset.js.map',
-    'swagger-ui.css',
-    'swagger-ui.css.map',
-    'swagger-ui.js',
-    'swagger-ui.js.map',
-  ].forEach((filename) => {
-    fs.createReadStream(`${swaggerUiAssetPath}/${filename}`).pipe(
-      fs.createWriteStream(path.resolve(`${STATIC_DIR}/${filename}`)),
-    );
-  });
+  await Promise.all(
+    [
+      'favicon-16x16.png',
+      'favicon-32x32.png',
+      'index.html',
+      'oauth2-redirect.html',
+      'swagger-ui-bundle.js',
+      'swagger-ui-bundle.js.map',
+      'swagger-ui-standalone-preset.js',
+      'swagger-ui-standalone-preset.js.map',
+      'swagger-ui.css',
+      'swagger-ui.css.map',
+      'swagger-ui.js',
+      'swagger-ui.js.map',
+    ].map(async (filename) => {
+      await copyFile(`${swaggerUiAssetPath}/${filename}`, path.resolve(`${STATIC_DIR}/${filename}`))
+    })
+  )
   const newIndex = await readFile(
     path.resolve(`${STATIC_DIR}/index.html`),
     'utf-8',
